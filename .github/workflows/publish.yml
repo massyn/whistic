@@ -31,10 +31,10 @@ jobs:
         python -m pip install .
         python -c "from whistic_sdk import Whistic, Vendors; print('Import successful')"
         python -c "import whistic_sdk; print(f'Package version: {whistic_sdk.__version__}')"
-        
-    # - name: Upload to PyPI
-    #   env:
-    #     TWINE_USERNAME: __token__
-    #     TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-    #   run: |
-    #     twine upload dist/*
+
+    - name: Upload to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        twine upload dist/*

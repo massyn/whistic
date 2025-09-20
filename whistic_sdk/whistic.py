@@ -6,6 +6,7 @@ import json
 import time
 import random
 from .vendors import Vendors
+from .vendorintakeform import VendorIntakeForm
 
 try:
     import colorama
@@ -37,7 +38,6 @@ logging.basicConfig(level=logging.INFO, handlers=[handler])
 
 class Whistic:
     def __init__(self, max_workers=5):
-        self.endpoint = "https://public.whistic.com/api"
         self.page_size = 25
         self.max_workers = max_workers
 
@@ -47,12 +47,21 @@ class Whistic:
         else:
             logging.info("Whistic token found")
 
+        if not 'WHISTIC_ENDPOINT' in os.environ:
+            self.endpoint = "https://public.whistic.com/api"
+        else:
+            self.endpoint = os.environ['WHISTIC_ENDPOINT']
+        logging.info(f"Using whistic endpoint {self.endpoint}")
+
+
         self.headers = {
             'accept' : 'application/json',
+            'content-type' : 'text/json',
             'api-key' : os.environ['WHISTIC_TOKEN']
         }
         
         self.vendors = Vendors(self)
+        self.vendor_intake_form = VendorIntakeForm(self)
 
     def _make_request_with_retry(self, url, max_retries=3):
         """Make a request with exponential backoff for rate limiting"""
@@ -106,4 +115,10 @@ if __name__ == '__main__':
 
     # == add a new vendor
     #W.vendors.new(data)
+
+    # == Get vendor intake form
+    intake_form = W.vendor_intake_form.get()
+    if intake_form:
+        with open('_vendor_intake_form.json', 'wt') as f:
+            f.write(json.dumps(intake_form, indent=2))
     

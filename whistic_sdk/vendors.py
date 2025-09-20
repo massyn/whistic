@@ -99,9 +99,33 @@ class Vendors:
             logging.error(f"{response.status_code} - {url} - {response.content}")
 
     def new(self, data):
+        import json
+        print(json.dumps(data,indent=2))
+
+        print(self.whistic.headers)
+
         url = f"{self.whistic.endpoint}/vendors?ignore_missing_custom_fields=true"
         response = requests.post(url, json=data, headers=self.whistic.headers, timeout=30)
-        if response.status_code == 200:
+        if response.status_code in [200, 201]:
             logging.info(f"{response.status_code} - {url}")
+            return True
         else:
             logging.error(f"{response.status_code} - {url} - {response.content}")
+            return False
+
+    def domain(self, domain):
+        """Retrieve vendor details by domain name"""
+        url = f"{self.whistic.endpoint}/vendorDomains/{domain}"
+        response = self.whistic._make_request_with_retry(url)
+
+        if response and response.status_code == 200:
+            logging.info(f"{response.status_code} - {url}")
+            data = response.json()
+            # API may return a list, so handle both cases
+            if isinstance(data, list):
+                return data[0] if data else None
+            return data
+        else:
+            if response:
+                logging.error(f"{response.status_code} - {url} - {response.content}")
+            return None

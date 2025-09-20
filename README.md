@@ -27,16 +27,31 @@ pip install -e .
 
 ### Environment Setup
 
-Create a `.env` file in your project root or set the environment variable:
+The Whistic SDK requires authentication via an API token. You must provide this token through the `WHISTIC_TOKEN` environment variable.
 
+**Method 1: Environment Variable (Linux/macOS)**
 ```bash
 export WHISTIC_TOKEN=your_api_token_here
 ```
 
-Or create a `.env` file:
+**Method 2: Environment Variable (Windows)**
+```cmd
+set WHISTIC_TOKEN=your_api_token_here
+```
+
+**Method 3: .env File (Recommended for development)**
+
+Create a `.env` file in your project root directory:
 ```
 WHISTIC_TOKEN=your_api_token_here
 ```
+
+The SDK will automatically load this file when you call `load_dotenv()` in your Python code (as shown in the examples below).
+
+**Important Notes:**
+- Never commit your `.env` file or API tokens to version control
+- Add `.env` to your `.gitignore` file
+- The API token is required for all SDK operations - the client will fail to initialize without it
 
 ### Basic Usage
 
@@ -74,6 +89,20 @@ new_vendor_data = {
     # ... other vendor fields
 }
 client.vendors.new(new_vendor_data)
+
+# Get vendor by domain
+vendor_by_domain = client.vendors.domain("example.com")
+if vendor_by_domain:
+    print(f"Found vendor: {vendor_by_domain.get('name', 'Unknown')}")
+
+# Get vendor intake form
+intake_form = client.vendor_intake_form.get()
+print(f"Intake form has {len(intake_form.get('sections', []))} sections")
+
+# Get all field names from the intake form
+field_names = client.vendor_intake_form.describe()
+print(f"Form contains {len(field_names)} unique field names: {field_names[:5]}...")
+print("Field types include: answered tags, N/A tags, comment tags, and file upload tags")
 ```
 
 ## Advanced Usage
@@ -101,6 +130,63 @@ for vendor in all_vendors:
         })
 ```
 
+### Vendor Intake Form
+
+```python
+# Get the vendor intake form structure
+intake_form = client.vendor_intake_form.get()
+
+if intake_form:
+    print(f"Form name: {intake_form.get('name', 'N/A')}")
+    print(f"Number of sections: {len(intake_form.get('sections', []))}")
+
+    # Display section information
+    for section in intake_form.get('sections', []):
+        print(f"Section: {section.get('name', 'Unnamed')}")
+        questions = section.get('questions', [])
+        print(f"  Questions: {len(questions)}")
+
+# Get the form structure as a dictionary
+form_structure = client.vendor_intake_form.describe()
+print(f"Form has {len(form_structure)} sections")
+
+# Show structure by section
+for section_name, questions in form_structure.items():
+    print(f"\n{section_name}: {len(questions)} questions")
+    for i, question in enumerate(questions[:3], 1):  # Show first 3
+        print(f"  {i}. {question}")
+    if len(questions) > 3:
+        print(f"  ... and {len(questions) - 3} more")
+
+# Submit a new vendor intake form
+# Field names are the exact question text from the intake form
+vendor_data = {
+    "Vendor URL": "example-vendor.com",
+    "Vendor Name": "Example Vendor Inc.",
+    "Product / Service Name": "Cloud Security Platform",
+    "Write a description of the vendor / service": "A comprehensive security solution",
+    "First Name": "John",
+    "Last Name": "Smith",
+    "Email Address": "john.smith@example-vendor.com",
+    "Job Title": "Security Manager"
+    # ... add other required fields
+}
+
+# Submit the vendor intake form (validates all required fields)
+success = client.vendor_intake_form.new(vendor_data)
+if success:
+    print("Vendor intake form submitted successfully!")
+else:
+    print("Failed to submit vendor intake form")
+
+# Submit with options
+success = client.vendor_intake_form.new(
+    vendor_data,
+    force=True,      # Skip domain existence check
+    validate=False   # Skip form validation
+)
+```
+
 ### Error Handling
 
 ```python
@@ -126,6 +212,7 @@ The main client class for interacting with the Whistic API.
 
 #### Properties
 - `vendors`: Access to vendor management operations
+- `vendor_intake_form`: Access to vendor intake form operations
 
 ### Vendors Class
 
@@ -151,6 +238,35 @@ Handles all vendor-related operations.
 
 - **`new(data)`**: Create a new vendor
   - Parameters: `data` (dict) - Complete vendor data structure
+
+- **`domain(domain)`**: Retrieve vendor details by domain name
+  - Parameters: `domain` (str) - The domain name to search for
+  - Returns: Vendor object if found, or None if not found
+
+### VendorIntakeForm Class
+
+Handles vendor intake form operations.
+
+#### Methods
+
+- **`get()`**: Retrieve the vendor intake form structure
+  - Returns: Complete intake form object with sections and questions, or None if not found
+  - The form contains all the questions and structure that vendors see during onboarding
+
+- **`describe()`**: Extract the hierarchical structure from the vendor intake form
+  - Returns: Dictionary with section names as keys and lists of question texts as values
+  - Example: `{"Vendor Information": ["Vendor URL", "Vendor Name", ...], "Primary Business Owner Information": [...]}`
+  - Useful for understanding the form structure and available fields in each section
+
+- **`new(form, **kwargs)`**: Submit a new vendor intake form
+  - Parameters:
+    - `form` (dict) - Dictionary containing form field values with question text as keys
+    - `force` (bool, optional) - If True, skip domain existence check (default: False)
+    - `validate` (bool, optional) - If True, validate form data against intake form structure (default: True)
+  - Returns: Boolean indicating success or failure of submission
+  - Validates required fields and converts simple key-value data into proper API submission format
+  - Automatically checks if vendor domain already exists unless force=True
+  - Example: `client.vendor_intake_form.new({"Vendor URL": "example.com", "Vendor Name": "Example Inc."})`
 
 ## Features
 

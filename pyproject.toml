@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "whistic"
-version = "0.0.1"
+version = "0.1.0"
 description = "Python SDK to interface with the Whistic API"
 readme = "README.md"
 license = {file = "LICENSE"}

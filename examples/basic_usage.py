@@ -72,6 +72,17 @@ def main():
     # print("Creating new vendor...")
     # client.vendors.new(new_vendor_data)
     # print("New vendor created successfully")
+
+    # List all vendors
+    print("Fetching vendor list...")
+    vendors = client.vendors.describe()
+    print(f"Found {len(vendors)} vendors")
+    
+    # Save vendor list to file
+    with open('vendors_describe.json', 'w') as f:
+        json.dump(vendors, f, indent=2)
+    print("Vendor list saved to vendors_describe.json")
+    
     
     print("Example completed successfully!")
 

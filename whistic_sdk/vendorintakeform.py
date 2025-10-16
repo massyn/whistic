@@ -114,8 +114,8 @@ class VendorIntakeForm:
                             if data[key] not in q['answer_options']:
                                 logging.error(f"Question {key} has an invalid option")
                                 error = True
-                                for i in q['answer_options']:
-                                    logging.error(f" - Valid option: {i}")
+                                for option in q['answer_options']:
+                                    logging.error(f" - Valid option: {option}")
                             else:
                                 q['chosen_answers'] = [ data[key]]
                                 custom_attributes_this['attributes'].append({
@@ -133,26 +133,26 @@ class VendorIntakeForm:
 
         # generate the payload
         payload = {
-            'url'           : data['Vendor Information:Vendor URL'],
-            'name'          : data['Vendor Information:Vendor Name'],
-            'service'       : data['Vendor Information:Product / Service Name'],
-            'description'   : data['Vendor Information:Write a description of the vendor / service'],
+            'url'           : data.get('Vendor Information:Vendor URL', ''),
+            'name'          : data.get('Vendor Information:Vendor Name', ''),
+            'service'       : data.get('Vendor Information:Product / Service Name', ''),
+            'description'   : data.get('Vendor Information:Write a description of the vendor / service', ''),
             'status'        : 'ACTIVE',
             'vendor_intake_form_identifier' : vif['identifier'],
             "external_contacts": [{
                 "title"     : data.get('Vendor Information:Job Title',''),
-                "first_name": data['Vendor Information:First Name'],
-                "last_name" : data['Vendor Information:Last Name'],
-                "email"     : data['Vendor Information:Email Address'],
+                "first_name": data.get('Vendor Information:First Name', ''),
+                "last_name" : data.get('Vendor Information:Last Name', ''),
+                "email"     : data.get('Vendor Information:Email Address', ''),
                 "phone"     : data.get('Vendor Information:Phone Number',''),
                 "type"      : "INTERNAL",
                 "editable"  : True
             }],
             "internal_contacts": [{
-                "first_name": data['Primary Business Owner Information:First Name'],
-                "last_name": data['Primary Business Owner Information:Last Name'],
-                "email": data['Primary Business Owner Information:Email Address'],
-                #"phone": KW['internal_phone'],
+                "first_name": data.get('Primary Business Owner Information:First Name', ''),
+                "last_name": data.get('Primary Business Owner Information:Last Name', ''),
+                "email": data.get('Primary Business Owner Information:Email Address', ''),
+                "phone": data.get('Primary Business Owner Information:Phone Number', ''),
                 "type": "INTERNAL",
                 "editable": True
             }],

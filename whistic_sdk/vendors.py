@@ -74,7 +74,7 @@ class Vendors:
 
     def update(self, vendor_id, data):
         url = f"{self.whistic.endpoint}/vendors/{vendor_id}?ignore_missing_custom_fields=true"
-        response = requests.put(url, json=json.dumps(data), headers=self.whistic.headers, timeout=30)
+        response = requests.put(url, json=data, headers=self.whistic.headers, timeout=30)
         if response.status_code == 200:
             logging.info(f"{response.status_code} - {url}")
         else:

@@ -99,10 +99,8 @@ if vendor_by_domain:
 intake_form = client.vendor_intake_form.get()
 print(f"Intake form has {len(intake_form.get('sections', []))} sections")
 
-# Get all field names from the intake form
-field_names = client.vendor_intake_form.describe()
-print(f"Form contains {len(field_names)} unique field names: {field_names[:5]}...")
-print("Field types include: answered tags, N/A tags, comment tags, and file upload tags")
+# Display the form structure with field names
+client.vendor_intake_form.show()
 ```
 
 ## Advanced Usage
@@ -133,58 +131,50 @@ for vendor in all_vendors:
 ### Vendor Intake Form
 
 ```python
+from whistic_sdk.vendorintakeform import VendorFormValidationError
+
 # Get the vendor intake form structure
 intake_form = client.vendor_intake_form.get()
 
 if intake_form:
-    print(f"Form name: {intake_form.get('name', 'N/A')}")
+    print(f"Form identifier: {intake_form.get('identifier', 'N/A')}")
     print(f"Number of sections: {len(intake_form.get('sections', []))}")
 
     # Display section information
     for section in intake_form.get('sections', []):
-        print(f"Section: {section.get('name', 'Unnamed')}")
-        questions = section.get('questions', [])
-        print(f"  Questions: {len(questions)}")
+        print(f"Section: {section.get('title', 'Unnamed')}")
+        for column in section.get('columns', []):
+            questions = column.get('questions', [])
+            print(f"  Questions: {len(questions)}")
 
-# Get the form structure as a dictionary
-form_structure = client.vendor_intake_form.describe()
-print(f"Form has {len(form_structure)} sections")
-
-# Show structure by section
-for section_name, questions in form_structure.items():
-    print(f"\n{section_name}: {len(questions)} questions")
-    for i, question in enumerate(questions[:3], 1):  # Show first 3
-        print(f"  {i}. {question}")
-    if len(questions) > 3:
-        print(f"  ... and {len(questions) - 3} more")
+# Display the form structure for easy reference
+# This prints all field names in "Section:Question" format
+client.vendor_intake_form.show()
 
 # Submit a new vendor intake form
-# Field names are the exact question text from the intake form
+# Field names use the format "Section:Question"
 vendor_data = {
-    "Vendor URL": "example-vendor.com",
-    "Vendor Name": "Example Vendor Inc.",
-    "Product / Service Name": "Cloud Security Platform",
-    "Write a description of the vendor / service": "A comprehensive security solution",
-    "First Name": "John",
-    "Last Name": "Smith",
-    "Email Address": "john.smith@example-vendor.com",
-    "Job Title": "Security Manager"
-    # ... add other required fields
+    "Vendor Information:Vendor URL": "example-vendor.com",
+    "Vendor Information:Vendor Name": "Example Vendor Inc.",
+    "Vendor Information:Product / Service Name": "Cloud Security Platform",
+    "Vendor Information:Write a description of the vendor / service": "A comprehensive security solution",
+    "Vendor Information:First Name": "John",
+    "Vendor Information:Last Name": "Smith",
+    "Vendor Information:Email Address": "john.smith@example-vendor.com",
+    "Vendor Information:Job Title": "Security Manager",
+    "Primary Business Owner Information:First Name": "Jane",
+    "Primary Business Owner Information:Last Name": "Doe",
+    "Primary Business Owner Information:Email Address": "jane.doe@yourcompany.com"
+    # ... add other required fields in "Section:Question" format
 }
 
 # Submit the vendor intake form (validates all required fields)
-success = client.vendor_intake_form.new(vendor_data)
-if success:
-    print("Vendor intake form submitted successfully!")
-else:
-    print("Failed to submit vendor intake form")
-
-# Submit with options
-success = client.vendor_intake_form.new(
-    vendor_data,
-    force=True,      # Skip domain existence check
-    validate=False   # Skip form validation
-)
+try:
+    success = client.vendor_intake_form.vendor_intake(vendor_data)
+    if success:
+        print("Vendor intake form submitted successfully!")
+except VendorFormValidationError as e:
+    print(f"Form validation failed: {e}")
 ```
 
 ### Error Handling
@@ -250,23 +240,24 @@ Handles vendor intake form operations.
 #### Methods
 
 - **`get()`**: Retrieve the vendor intake form structure
-  - Returns: Complete intake form object with sections and questions, or None if not found
+  - Returns: Complete intake form object with sections, columns, and questions, or None if not found
   - The form contains all the questions and structure that vendors see during onboarding
+  - Includes metadata like identifiers, answer options, and required fields
 
-- **`describe()`**: Extract the hierarchical structure from the vendor intake form
-  - Returns: Dictionary with section names as keys and lists of question texts as values
-  - Example: `{"Vendor Information": ["Vendor URL", "Vendor Name", ...], "Primary Business Owner Information": [...]}`
-  - Useful for understanding the form structure and available fields in each section
+- **`show()`**: Display the form structure for reference
+  - Prints all field names in "Section:Question" format to the console
+  - Useful for understanding the form structure and field names needed for submission
+  - No return value - outputs directly to console
 
-- **`new(form, **kwargs)`**: Submit a new vendor intake form
+- **`vendor_intake(data)`**: Submit a new vendor intake form
   - Parameters:
-    - `form` (dict) - Dictionary containing form field values with question text as keys
-    - `force` (bool, optional) - If True, skip domain existence check (default: False)
-    - `validate` (bool, optional) - If True, validate form data against intake form structure (default: True)
-  - Returns: Boolean indicating success or failure of submission
-  - Validates required fields and converts simple key-value data into proper API submission format
-  - Automatically checks if vendor domain already exists unless force=True
-  - Example: `client.vendor_intake_form.new({"Vendor URL": "example.com", "Vendor Name": "Example Inc."})`
+    - `data` (dict) - Dictionary containing form field values using "Section:Question" format as keys
+  - Returns: Boolean indicating success (True) or failure (False) of submission
+  - Raises: `VendorFormValidationError` if required fields are missing or invalid
+  - Validates required fields and answer options before submission
+  - Automatically formats data into proper API submission structure
+  - Creates custom attributes from fields not in the standard vendor creation payload
+  - Example: `client.vendor_intake_form.vendor_intake({"Vendor Information:Vendor URL": "example.com", "Vendor Information:Vendor Name": "Example Inc."})`
 
 ## Features
 

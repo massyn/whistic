@@ -1,5 +1,6 @@
 import requests
 import logging
+import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
@@ -71,46 +72,22 @@ class Vendors:
                 logging.error(f"{response.status_code} - {url} - {response.content}")
             return None
 
-    def _deep_merge(self, orig, update_data):
-        """Recursively merge update_data into orig, only updating existing keys"""
-        for key, value in update_data.items():
-            if key not in orig:
-                logging.warning(f"Key '{key}' not found in original data, skipping")
-                continue
-                
-            if isinstance(value, dict) and isinstance(orig[key], dict):
-                # Recursively merge nested dictionaries
-                self._deep_merge(orig[key], value)
-            else:
-                # Update the value directly
-                orig[key] = value
-
     def update(self, vendor_id, data):
         url = f"{self.whistic.endpoint}/vendors/{vendor_id}?ignore_missing_custom_fields=true"
-        orig = self.get(vendor_id)
-        
-        # Deep merge the data into orig
-        self._deep_merge(orig, data)
-
-        response = requests.put(url, json=orig, headers=self.whistic.headers, timeout=30)
+        response = requests.put(url, json=json.dumps(data), headers=self.whistic.headers, timeout=30)
         if response.status_code == 200:
             logging.info(f"{response.status_code} - {url}")
         else:
             logging.error(f"{response.status_code} - {url} - {response.content}")
 
     def new(self, data):
-        import json
-        print(json.dumps(data,indent=2))
-
-        print(self.whistic.headers)
-
-        url = f"{self.whistic.endpoint}/vendors?ignore_missing_custom_fields=true"
+        url = f"{self.whistic.endpoint}/vendors?ignore_missing_custom_fields=false&use_automated_workflow=false"
         response = requests.post(url, json=data, headers=self.whistic.headers, timeout=30)
         if response.status_code in [200, 201]:
             logging.info(f"{response.status_code} - {url}")
             return True
         else:
-            logging.error(f"{response.status_code} - {url} - {response.content}")
+            logging.error(f"{response.status_code} - {url} - {response.text}")
             return False
 
     def domain(self, domain):

@@ -8,53 +8,27 @@ using the Whistic SDK. Use this as a template for building your submissions.
 
 from whistic_sdk import Whistic
 from dotenv import load_dotenv
-# Complete vendor intake form submission dictionary
-# Structure: {section_name: {field_name: value}}
-vendor_intake_submission = {
-    "Vendor Information": {
-        # Required fields
-        "Vendor URL": "example-vendor.com",
-        "Vendor Name": "Example Vendor Inc.",
-        "Product / Service Name": "Cloud Security Platform",
-        "Write a description of the vendor / service": "Comprehensive cloud security solution",
-        "Type of Vendor": "Software Provider",
-        "First Name": "John",              # Vendor contact
-        "Last Name": "Smith",
-        "Email Address": "john.smith@example-vendor.com",
-
-        # Optional fields
-        "Information Asset ID": "ASSET-12345",
-        "Primary Hosting Region": "US East",
-        "Job Title": "Security Manager",
-        "Phone Number": "+1-555-123-4567"
-    },
-
-    "Primary Business Owner Information": {
-        # Required fields
-        "First Name": "Jane",               # Internal business owner
-        "Last Name": "Doe",
-        "Email Address": "jane.doe@company.com",
-
-        # Optional fields
-        "Business Unit": "IT Security",
-        "Divisions": "Infrastructure, Compliance",
-        "Stakeholders Involved": "CISO, IT Manager"
-    },
-
-    "CIA Rating and Asset Tiering": {
-        # All fields optional
-        "Confidentiality": "High",
-        "Integrity": "High",
-        "Availability": "Medium",
-        "Asset Tier": "Tier 1",
-        "Information Classification": "Critical"
-    }
-}
 
 if __name__ == "__main__":
     load_dotenv()
     client = Whistic()
 
     # Submit the form
-    success = client.vendor_intake_form.new(vendor_intake_submission)
-    print(f"Submission result: {success}")
+    client.vendor_intake_form.vendor_intake({
+        "Vendor Information:Information Asset ID"                           : "12345",
+        "Vendor Information:Job Title"                                      : "CISO",           # mandatory field
+        "Vendor Information:Vendor URL"                                     : "example38.com",
+        "Vendor Information:Vendor Name"                                    : "Example Corp HLRA ID",
+        "Vendor Information:Product / Service Name"                         : "Cloud Patform",
+        "Vendor Information:Write a description of the vendor / service"    : "Cloud Platform",
+        "Vendor Information:First Name"                                     : "Bob",
+        "Vendor Information:Last Name"                                      : "Tester",
+        "Vendor Information:Email Address"                                  : "bob@example.com",
+        "Vendor Information:Type of Vendor"                                 : "Current: we already work with this vendor",
+        "Primary Business Owner Information:First Name"                     : "Joe",
+        "Primary Business Owner Information:Last Name"                      : "Blobs",
+        "Primary Business Owner Information:Email Address"                  : "joe@blobs.com",
+        "CIA Rating and Asset Tiering:Confidentiality"                      : "Minor",
+        "HLRA Questionnaire :What data or information will be shared?"      : "Only PII"
+    })
+

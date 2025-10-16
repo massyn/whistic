@@ -53,11 +53,10 @@ class Whistic:
             self.endpoint = os.environ['WHISTIC_ENDPOINT']
         logging.info(f"Using whistic endpoint {self.endpoint}")
 
-
         self.headers = {
             'accept' : 'application/json',
-            'content-type' : 'text/json',
-            'api-key' : os.environ['WHISTIC_TOKEN']
+            'Content-Type' : 'application/json',
+            'Api-Key' : os.environ['WHISTIC_TOKEN']
         }
         
         self.vendors = Vendors(self)

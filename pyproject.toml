@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "whistic"
-version = "0.2.0"
+version = "0.2.1"
 description = "Python SDK to interface with the Whistic API"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -46,7 +46,7 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["whistic_sdk*"]
+include = ["whistic*"]
 
 [tool.setuptools.package-data]
-whistic_sdk = ["*.md"]
+whistic = ["*.md"]

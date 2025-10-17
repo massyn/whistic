@@ -56,7 +56,7 @@ The SDK will automatically load this file when you call `load_dotenv()` in your 
 ### Basic Usage
 
 ```python
-from whistic_sdk import Whistic
+from whistic import Whistic
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -108,7 +108,7 @@ client.vendor_intake_form.show()
 ### Custom Configuration
 
 ```python
-from whistic_sdk import Whistic
+from whistic import Whistic
 
 # Configure with custom settings
 client = Whistic(max_workers=10)  # Increase parallel processing workers
@@ -131,7 +131,7 @@ for vendor in all_vendors:
 ### Vendor Intake Form
 
 ```python
-from whistic_sdk.vendorintakeform import VendorFormValidationError
+from whistic.vendorintakeform import VendorFormValidationError
 
 # Get the vendor intake form structure
 intake_form = client.vendor_intake_form.get()

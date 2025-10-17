@@ -9,7 +9,7 @@ Make sure you have your WHISTIC_TOKEN environment variable set before running.
 import json
 import os
 from dotenv import load_dotenv
-from whistic_sdk import Whistic
+from whistic import Whistic
 
 
 def main():

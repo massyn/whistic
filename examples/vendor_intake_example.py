@@ -6,7 +6,7 @@ This example shows the proper structure for submitting a vendor intake form
 using the Whistic SDK. Use this as a template for building your submissions.
 """
 
-from whistic_sdk import Whistic
+from whistic import Whistic
 from dotenv import load_dotenv
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from whistic_sdk import Whistic
+from whistic import Whistic
 from dotenv import load_dotenv
 import json
 import logging

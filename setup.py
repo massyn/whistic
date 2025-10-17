@@ -8,7 +8,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="whistic",
-    version="0.2.1",
+    version="0.3.0",
     author="Phil Massyn",
     author_email="phil.massyn@icloud.com",
     description="Python SDK to interface with the Whistic API",

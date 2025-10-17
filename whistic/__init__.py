@@ -9,7 +9,7 @@ from .whistic import Whistic
 from .vendors import Vendors
 from .vendorintakeform import VendorIntakeForm
 
-__version__ = "0.2.1"
+__version__ = "0.3.0"
 __author__ = "Phil Massyn"
 __email__ = "phil.massyn@icloud.com"
 __description__ = "Python SDK to interface with the Whistic API"

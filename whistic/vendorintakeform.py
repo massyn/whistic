@@ -50,6 +50,10 @@ class VendorIntakeForm:
         '''show the intake form in a way we can add the fields to the vendor_intake process'''
         vif = self.get()
 
+        if not vif:
+            logging.error("Failed to retrieve vendor intake form")
+            return None
+
         frm = {}
         for i in vif['sections']:
             for c in i['columns']:
@@ -62,6 +66,11 @@ class VendorIntakeForm:
 
     def vendor_intake(self,data):
         vif = self.get()
+
+        if not vif:
+            logging.error("Failed to retrieve vendor intake form")
+            raise VendorFormValidationError("Could not retrieve vendor intake form from API")
+
         # == validate we got the required data in the form
         # This is a list of fields that are in the vendor intake form that should not make their way to the custom attributes
         fields_to_ignore = {

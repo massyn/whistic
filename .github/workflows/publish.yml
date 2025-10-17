@@ -29,8 +29,8 @@ jobs:
     - name: Test the Package
       run: |
         python -m pip install .
-        python -c "from whistic_sdk import Whistic, Vendors; print('Import successful')"
-        python -c "import whistic_sdk; print(f'Package version: {whistic_sdk.__version__}')"
+        python -c "from whistic import Whistic, Vendors; print('Import successful')"
+        python -c "import whistic; print(f'Package version: {whistic.__version__}')"
 
     - name: Upload to PyPI
       env:
